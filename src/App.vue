@@ -22,6 +22,7 @@ const onLogout = () => {
         </div>
 
         <nav class="flex items-center gap-2">
+          <RouterLink class="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100" to="/profile">画像</RouterLink>
           <RouterLink class="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100" to="/reports">报告</RouterLink>
           <RouterLink class="rounded-lg px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100" to="/tasks">任务</RouterLink>
           <button
