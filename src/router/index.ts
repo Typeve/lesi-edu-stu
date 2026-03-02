@@ -4,6 +4,7 @@ import LoginPage from "../pages/LoginPage.vue";
 import ReportsPage from "../pages/ReportsPage.vue";
 import AssessmentQuestionsPage from "../pages/AssessmentQuestionsPage.vue";
 import AssessmentResultPage from "../pages/AssessmentResultPage.vue";
+import RoleModelsPage from "../pages/RoleModelsPage.vue";
 import ProfilePage from "../pages/ProfilePage.vue";
 import TasksPage from "../pages/TasksPage.vue";
 import { useAuthStore } from "../stores/auth";
@@ -17,6 +18,7 @@ const router = createRouter({
     { path: "/profile", component: ProfilePage, meta: { requiresAuth: true, requiresVerified: true } },
     { path: "/assessment", component: AssessmentQuestionsPage, meta: { requiresAuth: true, requiresVerified: true } },
     { path: "/assessment/result", component: AssessmentResultPage, meta: { requiresAuth: true, requiresVerified: true } },
+    { path: "/role-models", component: RoleModelsPage, meta: { requiresAuth: true, requiresVerified: true } },
     { path: "/reports", component: ReportsPage, meta: { requiresAuth: true, requiresVerified: true } },
     { path: "/tasks", component: TasksPage, meta: { requiresAuth: true, requiresVerified: true } }
   ]
