@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import FirstVerifyPage from "../pages/FirstVerifyPage.vue";
 import LoginPage from "../pages/LoginPage.vue";
 import ReportsPage from "../pages/ReportsPage.vue";
+import ReportDetailPage from "../pages/ReportDetailPage.vue";
 import AssessmentQuestionsPage from "../pages/AssessmentQuestionsPage.vue";
 import AssessmentResultPage from "../pages/AssessmentResultPage.vue";
 import RoleModelsPage from "../pages/RoleModelsPage.vue";
@@ -20,6 +21,7 @@ const router = createRouter({
     { path: "/assessment/result", component: AssessmentResultPage, meta: { requiresAuth: true, requiresVerified: true } },
     { path: "/role-models", component: RoleModelsPage, meta: { requiresAuth: true, requiresVerified: true } },
     { path: "/reports", component: ReportsPage, meta: { requiresAuth: true, requiresVerified: true } },
+    { path: "/reports/:direction", component: ReportDetailPage, meta: { requiresAuth: true, requiresVerified: true } },
     { path: "/tasks", component: TasksPage, meta: { requiresAuth: true, requiresVerified: true } }
   ]
 });
