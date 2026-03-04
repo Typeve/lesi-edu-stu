@@ -8,33 +8,123 @@ import AssessmentResultPage from "../pages/AssessmentResultPage.vue";
 import RoleModelsPage from "../pages/RoleModelsPage.vue";
 import ProfilePage from "../pages/ProfilePage.vue";
 import TasksPage from "../pages/TasksPage.vue";
-import { useAuthStore } from "../stores/auth";
+import { getDefaultRouteByRole, useAuthStore } from "../stores/auth";
+import type { AuthRole } from "../types/auth";
+
+declare module "vue-router" {
+  interface RouteMeta {
+    requiresAuth?: boolean;
+    requiresVerified?: boolean;
+    guestOnly?: boolean;
+    roles?: AuthRole[];
+    permissions?: string[];
+  }
+}
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: "/", redirect: "/login" },
-    { path: "/login", component: LoginPage },
-    { path: "/first-verify", component: FirstVerifyPage, meta: { requiresAuth: true } },
-    { path: "/profile", component: ProfilePage, meta: { requiresAuth: true, requiresVerified: true } },
-    { path: "/assessment", component: AssessmentQuestionsPage, meta: { requiresAuth: true, requiresVerified: true } },
-    { path: "/assessment/result", component: AssessmentResultPage, meta: { requiresAuth: true, requiresVerified: true } },
-    { path: "/role-models", component: RoleModelsPage, meta: { requiresAuth: true, requiresVerified: true } },
-    { path: "/reports", component: ReportsPage, meta: { requiresAuth: true, requiresVerified: true } },
-    { path: "/reports/:direction", component: ReportDetailPage, meta: { requiresAuth: true, requiresVerified: true } },
-    { path: "/tasks", component: TasksPage, meta: { requiresAuth: true, requiresVerified: true } }
+    {
+      path: "/",
+      redirect: () => {
+        const auth = useAuthStore();
+        if (!auth.state.user) {
+          return "/login";
+        }
+        return getDefaultRouteByRole(auth.state.user.role);
+      }
+    },
+    { path: "/login", component: LoginPage, meta: { requiresAuth: false, guestOnly: true } },
+    {
+      path: "/first-verify",
+      component: FirstVerifyPage,
+      meta: { requiresAuth: true, roles: ["student"] }
+    },
+    {
+      path: "/profile",
+      component: ProfilePage,
+      meta: { requiresAuth: true, requiresVerified: true, roles: ["student"], permissions: ["student.profile.read"] }
+    },
+    {
+      path: "/assessment",
+      component: AssessmentQuestionsPage,
+      meta: {
+        requiresAuth: true,
+        requiresVerified: true,
+        roles: ["student"],
+        permissions: ["student.assessment.submit"]
+      }
+    },
+    {
+      path: "/assessment/result",
+      component: AssessmentResultPage,
+      meta: {
+        requiresAuth: true,
+        requiresVerified: true,
+        roles: ["student"],
+        permissions: ["student.assessment.submit"]
+      }
+    },
+    {
+      path: "/role-models",
+      component: RoleModelsPage,
+      meta: { requiresAuth: true, requiresVerified: true, roles: ["student"] }
+    },
+    {
+      path: "/reports",
+      component: ReportsPage,
+      meta: { requiresAuth: true, requiresVerified: true, roles: ["student"], permissions: ["report.read"] }
+    },
+    {
+      path: "/reports/:direction",
+      component: ReportDetailPage,
+      meta: { requiresAuth: true, requiresVerified: true, roles: ["student"], permissions: ["report.read"] }
+    },
+    {
+      path: "/tasks",
+      component: TasksPage,
+      meta: { requiresAuth: true, requiresVerified: true, roles: ["student"], permissions: ["task.read"] }
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      redirect: "/"
+    }
   ]
 });
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const auth = useAuthStore();
 
-  if (to.meta.requiresAuth && !auth.isLoggedIn.value) {
+  if (!auth.state.initialized) {
+    await auth.initialize();
+  }
+
+  if (to.meta.guestOnly && auth.isLoggedIn.value) {
+    return getDefaultRouteByRole(auth.state.user!.role);
+  }
+
+  const requiresAuth = to.meta.requiresAuth !== false;
+
+  if (requiresAuth && !auth.isLoggedIn.value) {
+    return {
+      path: "/login",
+      query: {
+        redirect: to.fullPath
+      }
+    };
+  }
+
+  if (auth.state.user && auth.state.user.role !== "student") {
+    await auth.logout();
     return "/login";
   }
 
-  if (to.path === "/login" && auth.isLoggedIn.value) {
-    return auth.requiresFirstVerify.value ? "/first-verify" : "/reports";
+  if (to.meta.roles && !auth.hasRole(to.meta.roles)) {
+    return "/login";
+  }
+
+  if (to.meta.permissions && !auth.hasPermissions(to.meta.permissions)) {
+    return "/login";
   }
 
   if (to.meta.requiresVerified && auth.requiresFirstVerify.value) {

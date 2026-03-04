@@ -2,22 +2,15 @@
 import { computed, onMounted, ref } from "vue";
 import { assessmentApi } from "../services/assessment";
 import { ApiError } from "../services/http";
-import { useAuthStore } from "../stores/auth";
 import type { AssessmentResultResponse } from "../types/assessment";
 
-const auth = useAuthStore();
 const loading = ref(true);
 const errorText = ref("");
 const result = ref<AssessmentResultResponse | null>(null);
 
 onMounted(async () => {
-  if (!auth.state.token) {
-    loading.value = false;
-    return;
-  }
-
   try {
-    result.value = await assessmentApi.getResult(auth.state.token);
+    result.value = await assessmentApi.getResult();
   } catch (error) {
     errorText.value = error instanceof ApiError ? error.message : "结果加载失败";
   } finally {

@@ -2,10 +2,8 @@
 import { computed, onMounted, ref } from "vue";
 import { ApiError } from "../services/http";
 import { profileApi } from "../services/profile";
-import { useAuthStore } from "../stores/auth";
 import type { EnrollmentProfile } from "../types/profile";
 
-const auth = useAuthStore();
 const loading = ref(true);
 const errorText = ref("");
 const profile = ref<EnrollmentProfile | null>(null);
@@ -25,13 +23,8 @@ const tags = computed(() => {
 });
 
 onMounted(async () => {
-  if (!auth.state.token) {
-    loading.value = false;
-    return;
-  }
-
   try {
-    const result = await profileApi.getEnrollmentProfile(auth.state.token);
+    const result = await profileApi.getEnrollmentProfile();
     profile.value = result.profile;
   } catch (error) {
     if (error instanceof ApiError) {

@@ -3,10 +3,8 @@ import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { assessmentApi } from "../services/assessment";
 import { ApiError } from "../services/http";
-import { useAuthStore } from "../stores/auth";
 import type { LikertQuestion } from "../types/assessment";
 
-const auth = useAuthStore();
 const router = useRouter();
 
 const loading = ref(true);
@@ -18,13 +16,8 @@ const answers = ref<Record<number, number>>({});
 const answeredCount = computed(() => Object.keys(answers.value).length);
 
 onMounted(async () => {
-  if (!auth.state.token) {
-    loading.value = false;
-    return;
-  }
-
   try {
-    const result = await assessmentApi.getQuestions(auth.state.token);
+    const result = await assessmentApi.getQuestions();
     questions.value = result.questions;
   } catch (error) {
     errorText.value = error instanceof ApiError ? error.message : "题目加载失败";
@@ -34,10 +27,6 @@ onMounted(async () => {
 });
 
 const onSubmit = async () => {
-  if (!auth.state.token) {
-    return;
-  }
-
   submitting.value = true;
   errorText.value = "";
 
@@ -47,7 +36,7 @@ const onSubmit = async () => {
   }));
 
   try {
-    await assessmentApi.submitAnswers(auth.state.token, payload);
+    await assessmentApi.submitAnswers(payload);
     await router.push("/assessment/result");
   } catch (error) {
     errorText.value = error instanceof ApiError ? error.message : "提交失败";
