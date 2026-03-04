@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import { assessmentApi } from "../services/assessment";
 import { ApiError } from "../services/http";
 import type { AssessmentResultResponse } from "../types/assessment";
+
+const router = useRouter();
 
 const loading = ref(true);
 const errorText = ref("");
@@ -33,37 +36,53 @@ const bars = computed(() => {
 
 const nextActionText = computed(() => {
   const direction = result.value?.recommendation.direction;
-  if (direction === "postgraduate") return "建议下一步：查看升学方向榜样与报告。";
-  if (direction === "civil_service") return "建议下一步：查看公考方向榜样与报告。";
-  return "建议下一步：查看就业方向榜样与报告。";
+  if (direction === "postgraduate") return "建议下一步：优先查看升学方向榜样和报告。";
+  if (direction === "civil_service") return "建议下一步：优先查看公考方向榜样和报告。";
+  return "建议下一步：优先查看就业方向榜样和报告。";
 });
+
+const jumpToNext = async () => {
+  const direction = result.value?.recommendation.direction;
+  if (!direction) {
+    await router.push("/reports");
+    return;
+  }
+
+  await router.push(`/reports/${direction}`);
+};
 </script>
 
 <template>
-  <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow">
-    <h1 class="text-xl font-bold text-slate-900">测评结果</h1>
+  <section class="surface p-5 sm:p-6">
+    <h1 class="section-title">测评结果</h1>
+    <p class="section-subtitle">以下维度基于你的最新答题结果自动计算。</p>
 
-    <p v-if="loading" class="mt-4 text-sm text-slate-500">结果加载中...</p>
-    <p v-else-if="errorText" class="mt-4 text-sm text-rose-600">{{ errorText }}</p>
+    <p v-if="loading" class="state-loading mt-6">结果加载中...</p>
+    <p v-else-if="errorText" class="state-error mt-6">{{ errorText }}</p>
 
-    <template v-else>
-      <div class="mt-5 space-y-3">
-        <article v-for="item in bars" :key="item.key">
-          <div class="mb-1 flex items-center justify-between text-sm text-slate-700">
-            <span>{{ item.label }}</span>
-            <span>{{ item.value }}</span>
-          </div>
-          <div class="h-3 rounded bg-slate-100">
-            <div class="h-3 rounded bg-brand-500" :style="{ width: `${item.value}%` }"></div>
+    <template v-else-if="result">
+      <div class="mt-6 grid gap-3 md:grid-cols-3">
+        <article v-for="item in bars" :key="item.key" class="surface-soft p-4">
+          <p class="text-xs text-slate-500">{{ item.label }}</p>
+          <p class="kpi-value">{{ item.value }}</p>
+          <div class="mt-3 h-2 rounded-full bg-slate-100">
+            <div class="h-2 rounded-full bg-brand-600 transition-[width] duration-300" :style="{ width: `${item.value}%` }"></div>
           </div>
         </article>
       </div>
 
-      <p class="mt-5 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700">
-        {{ result?.recommendation.summary }}
-      </p>
+      <article class="surface-soft mt-4 p-4">
+        <p class="text-sm font-medium text-slate-900">方向建议</p>
+        <p class="mt-2 text-sm leading-7 text-slate-700">{{ result.recommendation.summary }}</p>
+        <p class="mt-3 text-sm font-semibold text-brand-700">{{ nextActionText }}</p>
+      </article>
 
-      <p class="mt-3 text-sm font-medium text-brand-700">{{ nextActionText }}</p>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button class="btn-primary" @click="jumpToNext">查看推荐报告</button>
+        <button class="btn-secondary" @click="router.push('/role-models')">查看榜样案例</button>
+      </div>
     </template>
+
+    <p v-else class="state-empty mt-6">暂无测评结果，请先完成测评答题。</p>
   </section>
 </template>

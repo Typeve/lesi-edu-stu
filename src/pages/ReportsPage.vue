@@ -13,18 +13,41 @@ const router = useRouter();
 const loading = ref(true);
 const errorText = ref("");
 
-const reportMeta: Array<{ direction: ReportDirection; title: string }> = [
-  { direction: "employment", title: "就业报告" },
-  { direction: "postgraduate", title: "升学报告" },
-  { direction: "civil_service", title: "公考报告" }
+const reportMeta: Array<{ direction: ReportDirection; title: string; desc: string }> = [
+  { direction: "employment", title: "就业报告", desc: "岗位方向与能力建议" },
+  { direction: "postgraduate", title: "升学报告", desc: "院校与备考建议" },
+  { direction: "civil_service", title: "公考报告", desc: "岗位匹配与阶段策略" }
 ];
 
+const getPreview = (content: string): string => {
+  if (!content.trim()) {
+    return "报告尚未生成。";
+  }
+
+  const line = content
+    .split("\n")
+    .map((value) => value.trim())
+    .find((value) => value && !value.startsWith("#") && !value.startsWith("-") && !value.startsWith("*"));
+
+  if (!line) {
+    return "报告已生成，点击查看完整内容。";
+  }
+
+  return line.length > 56 ? `${line.slice(0, 56)}...` : line;
+};
+
 const items = computed(() =>
-  reportMeta.map((meta) => ({
-    ...meta,
-    exists: Boolean(reportStore.state.reports[meta.direction])
-  }))
+  reportMeta.map((meta) => {
+    const markdown = reportStore.state.reports[meta.direction];
+    return {
+      ...meta,
+      exists: Boolean(markdown),
+      preview: getPreview(markdown)
+    };
+  })
 );
+
+const hasAnyReport = computed(() => items.value.some((item) => item.exists));
 
 onMounted(async () => {
   loading.value = true;
@@ -46,31 +69,40 @@ onMounted(async () => {
 const openDetail = async (direction: ReportDirection) => {
   await router.push(`/reports/${direction}`);
 };
+
+const goAssessment = async () => {
+  await router.push("/assessment");
+};
 </script>
 
 <template>
-  <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow">
-    <h1 class="text-xl font-bold text-slate-900">我的报告</h1>
-    <p class="mt-2 text-sm text-slate-600">可查看就业/升学/公考三份报告。</p>
+  <section class="surface p-5 sm:p-6">
+    <div class="flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <h1 class="section-title">我的报告</h1>
+        <p class="section-subtitle">系统将根据测评与画像生成就业、升学、公考三份报告。</p>
+      </div>
+      <span class="chip">作业 ID：{{ reportStore.state.jobId ?? "--" }}</span>
+    </div>
 
-    <p v-if="loading" class="mt-5 text-sm text-slate-500">加载中...</p>
-    <p v-else-if="errorText" class="mt-5 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700">{{ errorText }}</p>
+    <p v-if="loading" class="state-loading mt-6">报告生成中，请稍候...</p>
+    <p v-else-if="errorText" class="state-error mt-6">{{ errorText }}</p>
+    <p v-else-if="!hasAnyReport" class="state-empty mt-6">
+      当前暂无可查看报告。建议先完成测评后再重试。
+      <button class="btn-primary mt-3" @click="goAssessment">去做测评</button>
+    </p>
 
-    <ul v-else class="mt-6 space-y-3">
-      <li v-for="item in items" :key="item.direction" class="rounded-xl border border-slate-200 p-4">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <p class="text-sm font-semibold text-slate-900">{{ item.title }}</p>
-            <p class="mt-1 text-xs text-slate-500">状态：{{ item.exists ? "已生成" : "未生成" }}</p>
-          </div>
+    <ul v-else class="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      <li v-for="item in items" :key="item.direction" class="surface-soft p-4">
+        <p class="text-xs text-slate-500">{{ item.desc }}</p>
+        <p class="mt-1 text-base font-semibold tracking-tight text-slate-900">{{ item.title }}</p>
+        <p class="mt-2 text-sm leading-6 text-slate-700">{{ item.preview }}</p>
 
-          <button
-            class="rounded-lg bg-brand-500 px-3 py-1.5 text-sm text-white disabled:opacity-40"
-            :disabled="!item.exists"
-            @click="openDetail(item.direction)"
-          >
-            查看详情
-          </button>
+        <div class="mt-4 flex items-center justify-between">
+          <span class="chip" :class="item.exists ? '' : 'border-amber-300 bg-amber-50 text-amber-700'">
+            {{ item.exists ? "已生成" : "未生成" }}
+          </span>
+          <button class="btn-primary" :disabled="!item.exists" @click="openDetail(item.direction)">查看详情</button>
         </div>
       </li>
     </ul>

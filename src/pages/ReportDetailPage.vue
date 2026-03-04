@@ -19,23 +19,29 @@ const title = computed(() => {
   if (direction.value === "civil_service") return "公考报告";
   return "就业报告";
 });
+
+const directionDesc = computed(() => {
+  if (direction.value === "postgraduate") return "关注院校层次、专业匹配与备考安排。";
+  if (direction.value === "civil_service") return "关注岗位竞争比、阶段复习与岗位筛选。";
+  return "关注目标行业、岗位能力与求职节奏。";
+});
 </script>
 
 <template>
-  <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow">
-    <div class="mb-4 flex items-center justify-between">
-      <h1 class="text-xl font-bold text-slate-900">{{ title }}</h1>
-      <button class="rounded-lg bg-slate-100 px-3 py-1.5 text-sm text-slate-700" @click="router.push('/reports')">
-        返回列表
-      </button>
+  <section class="surface p-5 sm:p-6">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h1 class="section-title">{{ title }}</h1>
+        <p class="section-subtitle">{{ directionDesc }}</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button class="btn-secondary" @click="router.push('/reports')">返回报告列表</button>
+        <button class="btn-ghost" @click="router.push('/tasks')">去任务中心</button>
+      </div>
     </div>
 
-    <p v-if="!markdown" class="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700">报告内容暂不可用，请返回重试。</p>
+    <p v-if="!markdown" class="state-empty mt-6">报告内容暂不可用，请返回列表后重试。</p>
 
-    <article
-      v-else
-      class="prose prose-slate max-w-none prose-table:border prose-table:border-slate-200 prose-th:bg-slate-50"
-      v-html="html"
-    ></article>
+    <article v-else class="report-markdown mt-6 rounded-2xl border border-slate-200/70 bg-white px-4 py-5 sm:px-5" v-html="html"></article>
   </section>
 </template>

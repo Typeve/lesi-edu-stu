@@ -41,38 +41,56 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <section class="mx-auto max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow">
-    <h1 class="text-xl font-bold text-slate-900">首次登录校验</h1>
-    <p class="mt-2 text-sm text-slate-600">请按招生档案填写以下信息完成身份校验。</p>
+  <section class="surface p-5 sm:p-6">
+    <div class="grid gap-5 lg:grid-cols-[1fr_1.05fr] lg:items-start">
+      <article>
+        <h1 class="section-title">首次登录校验</h1>
+        <p class="section-subtitle">请与招生档案保持一致，系统将据此解锁你的学生身份。</p>
 
-    <form class="mt-6 grid gap-4 md:grid-cols-2" @submit.prevent="onSubmit">
-      <label class="block text-sm md:col-span-1">
-        <span class="mb-1 block text-slate-700">姓名</span>
-        <input v-model="form.name" class="w-full rounded-lg border border-slate-300 px-3 py-2" required />
-      </label>
-      <label class="block text-sm md:col-span-1">
-        <span class="mb-1 block text-slate-700">证件号</span>
-        <input v-model="form.credentialNo" class="w-full rounded-lg border border-slate-300 px-3 py-2" required />
-      </label>
-      <label class="block text-sm md:col-span-1">
-        <span class="mb-1 block text-slate-700">院校</span>
-        <input v-model="form.schoolName" class="w-full rounded-lg border border-slate-300 px-3 py-2" required />
-      </label>
-      <label class="block text-sm md:col-span-1">
-        <span class="mb-1 block text-slate-700">专业</span>
-        <input v-model="form.majorName" class="w-full rounded-lg border border-slate-300 px-3 py-2" required />
-      </label>
+        <div class="mt-5 grid gap-3">
+          <div class="surface-soft p-4">
+            <p class="text-xs text-slate-500">校验用途</p>
+            <p class="mt-1 text-sm text-slate-800">用于绑定学生身份，防止报告与任务数据串号。</p>
+          </div>
+          <div class="surface-soft p-4">
+            <p class="text-xs text-slate-500">完成后</p>
+            <p class="mt-1 text-sm text-slate-800">可访问报告、任务中心及榜样案例模块。</p>
+          </div>
+        </div>
+      </article>
 
-      <p v-if="errorText" class="text-sm text-rose-600 md:col-span-2">{{ errorText }}</p>
-      <p v-if="success" class="text-sm text-emerald-600 md:col-span-2">校验成功，正在跳转...</p>
+      <form class="surface-soft p-4 sm:p-5" @submit.prevent="onSubmit">
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="block md:col-span-1">
+            <span class="field-label">姓名</span>
+            <input v-model="form.name" class="input-field" required placeholder="与招生档案一致" />
+          </label>
 
-      <button
-        type="submit"
-        class="md:col-span-2 rounded-lg bg-brand-500 px-3 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
-        :disabled="loading"
-      >
-        {{ loading ? "提交中..." : "提交校验" }}
-      </button>
-    </form>
+          <label class="block md:col-span-1">
+            <span class="field-label">证件号</span>
+            <input v-model="form.credentialNo" class="input-field" required placeholder="请输入证件号" />
+          </label>
+
+          <label class="block md:col-span-1">
+            <span class="field-label">院校</span>
+            <input v-model="form.schoolName" class="input-field" required placeholder="例如：XX大学" />
+          </label>
+
+          <label class="block md:col-span-1">
+            <span class="field-label">专业</span>
+            <input v-model="form.majorName" class="input-field" required placeholder="例如：计算机科学与技术" />
+          </label>
+        </div>
+
+        <p v-if="errorText" class="state-error mt-4">{{ errorText }}</p>
+        <p v-if="success" class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          校验成功，正在跳转到报告页...
+        </p>
+
+        <button type="submit" class="btn-primary mt-4 w-full" :disabled="loading">
+          {{ loading ? "提交中..." : "提交并完成校验" }}
+        </button>
+      </form>
+    </div>
   </section>
 </template>
