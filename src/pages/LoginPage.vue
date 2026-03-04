@@ -53,29 +53,60 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <section class="mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow">
-    <h1 class="text-xl font-bold text-slate-900">学生登录</h1>
-    <p class="mt-2 text-sm text-slate-600">请输入学号（账号）和密码登录系统。</p>
+  <section class="mx-auto grid min-h-[100dvh] w-full max-w-[1400px] items-center gap-6 px-4 py-6 md:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:py-8">
+    <article class="surface hidden p-8 lg:block">
+      <p class="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-500">LESI EDU</p>
+      <h1 class="mt-4 text-4xl font-semibold leading-tight tracking-tight text-slate-900">进入学生成长空间</h1>
+      <p class="mt-4 max-w-[40ch] text-sm leading-7 text-slate-600">
+        在这里完成测评、查看报告、跟进任务打卡。登录后系统会自动恢复你的学习状态与阶段进度。
+      </p>
 
-    <form class="mt-6 space-y-4" @submit.prevent="onSubmit">
-      <label class="block text-sm">
-        <span class="mb-1 block text-slate-700">学号/账号</span>
-        <input v-model="form.account" class="w-full rounded-lg border border-slate-300 px-3 py-2" required />
-      </label>
-      <label class="block text-sm">
-        <span class="mb-1 block text-slate-700">密码</span>
-        <input v-model="form.password" type="password" class="w-full rounded-lg border border-slate-300 px-3 py-2" required />
-      </label>
+      <div class="mt-10 grid gap-3">
+        <div class="surface-soft p-4">
+          <p class="text-xs text-slate-500">流程 01</p>
+          <p class="mt-1 text-sm font-medium text-slate-900">首次校验</p>
+        </div>
+        <div class="surface-soft p-4">
+          <p class="text-xs text-slate-500">流程 02</p>
+          <p class="mt-1 text-sm font-medium text-slate-900">职业测评与榜样匹配</p>
+        </div>
+        <div class="surface-soft p-4">
+          <p class="text-xs text-slate-500">流程 03</p>
+          <p class="mt-1 text-sm font-medium text-slate-900">报告阅读与任务闭环</p>
+        </div>
+      </div>
+    </article>
 
-      <p v-if="errorText" class="text-sm text-rose-600">{{ errorText }}</p>
+    <article class="surface mx-auto w-full max-w-lg p-5 sm:p-7">
+      <h2 class="section-title">学生登录</h2>
+      <p class="section-subtitle">请输入学号（账号）和密码登录系统。</p>
 
-      <button
-        type="submit"
-        class="w-full rounded-lg bg-brand-500 px-3 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
-        :disabled="submitting"
-      >
-        {{ submitting ? "登录中..." : "登录" }}
-      </button>
-    </form>
+      <form class="mt-6 space-y-4" @submit.prevent="onSubmit">
+        <label class="block">
+          <span class="field-label">学号 / 账号</span>
+          <input v-model="form.account" class="input-field" required autocomplete="username" placeholder="例如：2024010001" />
+          <p class="field-help">账号通常为学校分配的学号。</p>
+        </label>
+
+        <label class="block">
+          <span class="field-label">密码</span>
+          <input
+            v-model="form.password"
+            type="password"
+            class="input-field"
+            required
+            autocomplete="current-password"
+            placeholder="请输入登录密码"
+          />
+          <p class="field-help">若为首次登录，请使用学校初始密码后及时修改。</p>
+        </label>
+
+        <p v-if="errorText" class="state-error">{{ errorText }}</p>
+
+        <button type="submit" class="btn-primary w-full" :disabled="submitting">
+          {{ submitting ? "登录中..." : "登录并继续" }}
+        </button>
+      </form>
+    </article>
   </section>
 </template>
