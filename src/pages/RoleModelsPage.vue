@@ -2,10 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { ApiError } from "../services/http";
 import { roleModelApi } from "../services/role-model";
-import { useAuthStore } from "../stores/auth";
 import type { RoleModelDirection, RoleModelItem } from "../types/role-model";
-
-const auth = useAuthStore();
 
 const tabs: Array<{ key: RoleModelDirection; label: string }> = [
   { key: "employment", label: "就业" },
@@ -30,15 +27,11 @@ const maskedModels = computed(() =>
 );
 
 const load = async (direction: RoleModelDirection) => {
-  if (!auth.state.token) {
-    return;
-  }
-
   loading.value = true;
   errorText.value = "";
 
   try {
-    const result = await roleModelApi.list(auth.state.token, direction);
+    const result = await roleModelApi.list(direction);
     models.value = result.models;
     selected.value = result.models[0] ?? null;
   } catch (error) {

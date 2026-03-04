@@ -31,10 +31,7 @@ onMounted(async () => {
   errorText.value = "";
 
   try {
-    if (!auth.state.token) {
-      throw new Error("未登录");
-    }
-    await reportStore.ensureLoaded(auth.state.token);
+    await reportStore.ensureLoaded(auth.state.user?.userId ?? "");
   } catch (error) {
     if (error instanceof ApiError) {
       errorText.value = `报告加载失败：${error.message}`;

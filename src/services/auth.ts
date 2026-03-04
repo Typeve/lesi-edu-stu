@@ -1,18 +1,45 @@
 import { requestJson } from "./http";
-import type { FirstLoginVerifyPayload, FirstLoginVerifyResponse, StudentLoginResponse } from "../types/auth";
+import type {
+  FirstLoginVerifyPayload,
+  FirstLoginVerifyResponse,
+  AuthUser,
+  UnifiedLoginResponse
+} from "../types/auth";
 
 export const authApi = {
-  login(payload: { studentNo: string; password: string }) {
-    return requestJson<StudentLoginResponse>("/auth/student/login", {
+  login(payload: { account: string; password: string }) {
+    return requestJson<UnifiedLoginResponse>("/auth/login", {
       method: "POST",
-      body: JSON.stringify(payload)
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(payload),
+      auth: false,
+      retryOnAuthFail: false
     });
   },
-  firstLoginVerify(token: string, payload: FirstLoginVerifyPayload) {
+  refresh() {
+    return requestJson<UnifiedLoginResponse>("/auth/refresh", {
+      method: "POST",
+      auth: false,
+      retryOnAuthFail: false
+    });
+  },
+  logout() {
+    return requestJson<{ message: string }>("/auth/logout", {
+      method: "POST",
+      auth: false,
+      retryOnAuthFail: false
+    });
+  },
+  me() {
+    return requestJson<AuthUser>("/auth/me");
+  },
+  firstLoginVerify(payload: FirstLoginVerifyPayload) {
     return requestJson<FirstLoginVerifyResponse>("/auth/student/first-login-verify", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`
+        "content-type": "application/json"
       },
       body: JSON.stringify(payload)
     });

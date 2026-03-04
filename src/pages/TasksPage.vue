@@ -2,10 +2,7 @@
 import { computed, reactive, ref } from "vue";
 import { ApiError } from "../services/http";
 import { submitTaskCheckIn, uploadCertificate } from "../services/task";
-import { useAuthStore } from "../stores/auth";
 import type { TaskDirection, TaskItem, TaskStatus } from "../types/task";
-
-const auth = useAuthStore();
 
 const filters = reactive<{
   semester: string;
@@ -79,7 +76,7 @@ const onFileChange = (event: Event) => {
 };
 
 const submit = async () => {
-  if (!auth.state.token || !modalTask.value || !uploadFile.value) {
+  if (!modalTask.value || !uploadFile.value) {
     feedback.value = "请先选择附件。";
     return;
   }
@@ -88,8 +85,8 @@ const submit = async () => {
   feedback.value = "";
 
   try {
-    const upload = await uploadCertificate(auth.state.token, uploadFile.value);
-    await submitTaskCheckIn(auth.state.token, modalTask.value.id, {
+    const upload = await uploadCertificate(uploadFile.value);
+    await submitTaskCheckIn(modalTask.value.id, {
       fileId: upload.fileId,
       note: note.value
     });
