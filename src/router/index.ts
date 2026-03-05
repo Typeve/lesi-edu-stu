@@ -43,14 +43,13 @@ const router = createRouter({
     {
       path: "/profile",
       component: ProfilePage,
-      meta: { requiresAuth: true, requiresVerified: true, roles: ["student"], permissions: ["student.profile.read"] }
+      meta: { requiresAuth: true, roles: ["student"], permissions: ["student.profile.read"] }
     },
     {
       path: "/assessment",
       component: AssessmentQuestionsPage,
       meta: {
         requiresAuth: true,
-        requiresVerified: true,
         roles: ["student"],
         permissions: ["student.assessment.submit"]
       }
@@ -60,7 +59,6 @@ const router = createRouter({
       component: AssessmentResultPage,
       meta: {
         requiresAuth: true,
-        requiresVerified: true,
         roles: ["student"],
         permissions: ["student.assessment.submit"]
       }
@@ -68,7 +66,7 @@ const router = createRouter({
     {
       path: "/role-models",
       component: RoleModelsPage,
-      meta: { requiresAuth: true, requiresVerified: true, roles: ["student"] }
+      meta: { requiresAuth: true, roles: ["student"] }
     },
     {
       path: "/reports",

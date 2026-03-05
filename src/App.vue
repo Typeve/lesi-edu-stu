@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "./stores/auth";
 import { useReportStore } from "./stores/report";
@@ -30,12 +30,14 @@ const currentMeta = computed(() => {
 });
 
 const navItems = [
-  { to: "/profile", title: "画像", desc: "查看招生画像" },
-  { to: "/assessment", title: "测评", desc: "完成职业测评" },
-  { to: "/role-models", title: "榜样", desc: "参考优秀案例" },
-  { to: "/reports", title: "报告", desc: "查看三份报告" },
-  { to: "/tasks", title: "任务", desc: "任务与打卡" }
+  { to: "/profile", title: "画像", desc: "查看招生画像", requiresVerified: false },
+  { to: "/assessment", title: "测评", desc: "完成职业测评", requiresVerified: false },
+  { to: "/role-models", title: "榜样", desc: "参考优秀案例", requiresVerified: false },
+  { to: "/reports", title: "报告", desc: "查看三份报告", requiresVerified: true },
+  { to: "/tasks", title: "任务", desc: "任务与打卡", requiresVerified: true }
 ];
+
+const blockedNavMessage = ref("");
 
 const isActiveLink = (to: string) => {
   if (to === "/reports") {
@@ -52,6 +54,24 @@ const onLogout = async () => {
   reportStore.reset();
   await router.replace("/login");
 };
+
+const onNavClick = (item: (typeof navItems)[number], event: Event) => {
+  if (!auth.requiresFirstVerify.value || !item.requiresVerified) {
+    blockedNavMessage.value = "";
+    return;
+  }
+
+  event.preventDefault();
+  blockedNavMessage.value = "请先完成首次校验，再访问报告与任务模块。";
+  void router.replace("/first-verify");
+};
+
+watch(
+  () => route.path,
+  () => {
+    blockedNavMessage.value = "";
+  }
+);
 </script>
 
 <template>
@@ -79,7 +99,11 @@ const onLogout = async () => {
             :key="item.to"
             :to="item.to"
             class="nav-link"
-            :class="isActiveLink(item.to) ? 'nav-link-active' : ''"
+            :class="[
+              isActiveLink(item.to) ? 'nav-link-active' : '',
+              auth.requiresFirstVerify && item.requiresVerified ? 'opacity-80' : ''
+            ]"
+            @click="onNavClick(item, $event)"
           >
             <div>
               <p class="nav-link-title">{{ item.title }}</p>
@@ -88,6 +112,10 @@ const onLogout = async () => {
             <span class="text-xs text-slate-400">›</span>
           </RouterLink>
         </nav>
+
+        <p v-if="blockedNavMessage" class="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+          {{ blockedNavMessage }}
+        </p>
 
         <button class="btn-secondary mt-4 w-full" @click="onLogout">退出登录</button>
       </aside>
@@ -104,7 +132,7 @@ const onLogout = async () => {
           </div>
 
           <p v-if="route.path === '/first-verify'" class="state-empty mt-4">
-            完成首次校验后，可访问测评、报告、任务等完整能力。
+            完成首次校验后，可访问报告与任务模块。
           </p>
         </header>
 
