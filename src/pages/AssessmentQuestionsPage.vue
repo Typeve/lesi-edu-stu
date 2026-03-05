@@ -82,8 +82,8 @@ const onSubmit = async () => {
     <p v-else-if="errorText && !questions.length" class="state-error mt-6">{{ errorText }}</p>
 
     <form v-else class="mt-6 space-y-4" @submit.prevent="onSubmit">
-      <article v-for="question in questions" :key="question.questionId" class="surface-soft p-4">
-        <p class="text-sm font-medium leading-6 text-slate-900">{{ question.order }}. {{ question.text }}</p>
+      <article v-for="(question, index) in questions" :key="question.questionId" class="surface-soft p-4">
+        <p class="text-sm font-medium leading-6 text-slate-900">{{ index + 1 }}. {{ question.text }}</p>
 
         <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-5">
           <button
