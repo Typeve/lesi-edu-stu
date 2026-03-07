@@ -104,7 +104,7 @@ const onSubmit = async () => {
         <p v-if="errorText" class="state-error">{{ errorText }}</p>
 
         <button type="submit" class="btn-primary w-full" :disabled="submitting">
-          {{ submitting ? "登录中..." : "登录并继续" }}
+          {{ submitting ? "登录中..." : "登录" }}
         </button>
       </form>
     </article>
