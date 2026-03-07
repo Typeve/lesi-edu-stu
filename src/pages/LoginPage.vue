@@ -53,35 +53,66 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <section class="mx-auto grid min-h-[100dvh] w-full max-w-[1400px] items-center gap-6 px-4 py-6 md:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:py-8">
-    <article class="surface hidden p-8 lg:block">
-      <p class="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-500">LESI EDU</p>
-      <h1 class="mt-4 text-4xl font-semibold leading-tight tracking-tight text-slate-900">进入学生成长空间</h1>
-      <p class="mt-4 max-w-[40ch] text-sm leading-7 text-slate-600">
-        在这里完成测评、查看报告、跟进任务打卡。登录后系统会自动恢复你的学习状态与阶段进度。
-      </p>
+  <section class="login-shell">
+    <article class="login-hero">
+      <div class="login-orb login-orb-primary"></div>
+      <div class="login-orb login-orb-secondary"></div>
 
-      <div class="mt-10 grid gap-3">
-        <div class="surface-soft p-4">
-          <p class="text-xs text-slate-500">流程 01</p>
-          <p class="mt-1 text-sm font-medium text-slate-900">首次校验</p>
+      <div class="login-hero-top">
+        <p class="login-kicker">Student Growth Portal</p>
+        <h1 class="login-title">内蒙古师范大学</h1>
+        <p class="login-subtitle">学生成长发展平台</p>
+        <p class="login-copy">
+          统一承接身份校验、职业测评、榜样参考、报告阅读与任务跟进，帮助学生持续完成成长路径中的每一步。
+        </p>
+      </div>
+
+      <div class="login-metric-grid">
+        <div class="login-metric-card">
+          <p class="login-metric-label">统一入口</p>
+          <p class="login-metric-value">登录后自动恢复学习进度</p>
         </div>
-        <div class="surface-soft p-4">
-          <p class="text-xs text-slate-500">流程 02</p>
-          <p class="mt-1 text-sm font-medium text-slate-900">职业测评与榜样匹配</p>
+        <div class="login-metric-card">
+          <p class="login-metric-label">成长流程</p>
+          <p class="login-metric-value">校验、测评、报告、任务闭环</p>
         </div>
-        <div class="surface-soft p-4">
-          <p class="text-xs text-slate-500">流程 03</p>
-          <p class="mt-1 text-sm font-medium text-slate-900">报告阅读与任务闭环</p>
+        <div class="login-metric-card">
+          <p class="login-metric-label">状态同步</p>
+          <p class="login-metric-value">按账号识别并进入当前阶段</p>
+        </div>
+      </div>
+
+      <div class="login-flow">
+        <div class="login-flow-item">
+          <span class="login-flow-index">01</span>
+          <div>
+            <p class="login-flow-title">首次校验</p>
+            <p class="login-flow-copy">确认基础身份信息，解锁完整功能。</p>
+          </div>
+        </div>
+        <div class="login-flow-item">
+          <span class="login-flow-index">02</span>
+          <div>
+            <p class="login-flow-title">职业测评</p>
+            <p class="login-flow-copy">完成测评并匹配适合的方向与榜样案例。</p>
+          </div>
+        </div>
+        <div class="login-flow-item">
+          <span class="login-flow-index">03</span>
+          <div>
+            <p class="login-flow-title">报告与任务</p>
+            <p class="login-flow-copy">查看结果报告并跟进阶段任务打卡。</p>
+          </div>
         </div>
       </div>
     </article>
 
-    <article class="surface mx-auto w-full max-w-lg p-5 sm:p-7">
-      <h2 class="section-title">学生登录</h2>
-      <p class="section-subtitle">请输入学号（账号）和密码登录系统。</p>
+    <article class="login-panel">
+      <div class="login-panel-badge">学生登录</div>
+      <h2 class="login-panel-title">欢迎进入学生空间</h2>
+      <p class="login-panel-copy">请输入学号（账号）和密码登录系统，平台将自动恢复你的当前学习阶段。</p>
 
-      <form class="mt-6 space-y-4" @submit.prevent="onSubmit">
+      <form class="login-form" @submit.prevent="onSubmit">
         <label class="block">
           <span class="field-label">学号 / 账号</span>
           <input v-model="form.account" class="input-field" required autocomplete="username" placeholder="例如：2024010001" />
@@ -107,6 +138,10 @@ const onSubmit = async () => {
           {{ submitting ? "登录中..." : "登录并继续" }}
         </button>
       </form>
+
+      <div class="login-panel-footer">
+        <p class="login-panel-note">登录后可继续完成测评、查看报告，并根据系统进度进入后续任务模块。</p>
+      </div>
     </article>
   </section>
 </template>
